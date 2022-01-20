@@ -8,4 +8,3 @@ data "aws_vpc" "default" {
 output "vpc" {
     value = data.aws_vpc.default.id
 }
-

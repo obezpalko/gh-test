@@ -38,7 +38,7 @@ resource "aws_instance" "kind" {
         packages:
             - jq
             - golang
-            
+
     USER_DATA
 }
 
