@@ -47,7 +47,7 @@ def run_http_server(server_class=http.server.HTTPServer, handler_class=AppHTTPHa
     tread = Thread(target=server.serve_forever, daemon=False)
     tread.start()
     logging.info(
-        f'http server started on %s:%s',
+        'http server started on %s:%s',
         socket.gethostbyname(socket.gethostname()), port,
     )
 

@@ -1,8 +1,8 @@
 variable "region" {
-    type = string
-    default = "eu-central-1"
+  type    = string
+  default = "eu-central-1"
 }
 variable "profile" {
-    type = string
-    default = "gh-test"
+  type    = string
+  default = "gh-test"
 }
