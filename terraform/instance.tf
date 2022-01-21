@@ -16,18 +16,21 @@ resource "aws_instance" "kind" {
     tags          = {
         Name      = "kind"
     }
-    root_block_device {
-        volume_size             = "100"
-        volume_type             = "gp2"
-        delete_on_termination   = false
-    }
+    # root_block_device {
+    #     volume_size             = "100"
+    #     volume_type             = "gp2"
+    #     delete_on_termination   = false
+    # }
     user_data = <<-USER_DATA
         #cloud-config
+        hostname: kind
+        preserve_hostname: true
+        prefer_fqdn_over_hostname: false
         final_message: The system is finally up, after $UPTIME seconds
         package_upgrade: true
+        package_update: true
         package_reboot_if_required: false
         locale: en_US.UTF-8
-        hostname: kind
         timezone: UTC
         ntp:
             enabled: true
@@ -36,8 +39,33 @@ resource "aws_instance" "kind" {
             devices:
                 - /
         packages:
-            - jq
+            - aws-apitools-common
+            - docker
             - golang
+            - jq
+            - kubectl
+        yum_repos:
+            kubernetes:
+                baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+                name: Kubernetes
+                enabled: 1
+                gpgcheck: 1
+                repo_gpgcheck: 1
+                gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+        write_files:
+            - path: /etc/profile
+              append: true
+              content: |
+                export GOPATH=/root/go
+                export PATH=$${PATH}:/root/go
+        runcmd:
+            - [ cloud-init-per, instance, docker_enable, systemctl, enable, docker ]
+            - [ cloud-init-per, instance, docker_start, systemctl, start, docker ]
+            - [ cloud-init-per, instance, kind, sh, -c,
+                "HOME=/root go get sigs.k8s.io/kind" ]
+            - [ cloud-init-per, instance, kind_bin, ln, -sf, /root/go/bin/kind, /usr/bin/ ]
+            - [ cloud-init-per, instance, kind_cluster, sh, -c,
+                "HOME=/root kind create cluster" ]
 
     USER_DATA
 }
