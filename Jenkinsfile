@@ -9,7 +9,6 @@ pipeline {
                 script {
                     def s = checkout scm;
                 }
-                // git branch: 'main', url: 'https://github.com/obezpalko/gh-test.git/'
             }
         }
         stage('Build') {

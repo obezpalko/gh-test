@@ -71,6 +71,12 @@ resource "aws_instance" "kind" {
             - [ cloud-init-per, instance, kind_bin, ln, -sf, /root/go/bin/kind, /usr/bin/ ]
             - [ cloud-init-per, instance, kind_cluster, sh, -c,
                 "HOME=/root kind create cluster" ]
+            - [ cloud-init-per, instance, helm_install, sh, -c,
+                "curl -L -s https://get.helm.sh/helm-v3.7.2-linux-amd64.tar.gz | sudo tar -C /usr/bin --strip-components=1 -xzf - linux-amd64/helm" ]
+            - [ cloud-init-per, instance, repo_clone,
+                git, clone, "https://github.com/obezpalko/gh-test.git", "/opt/gh-test" ]
+            - [ cloud-init-per, instance, helm_repo, sh, -c,
+                "HOME=/root helm repo add stable https://charts.helm.sh/stable" ]
 
     USER_DATA
 }
