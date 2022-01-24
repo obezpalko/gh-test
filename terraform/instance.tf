@@ -98,9 +98,9 @@ resource "aws_instance" "kind" {
             - [ cloud-init-per, instance, repo_clone,
                 git, clone, "https://github.com/obezpalko/gh-test.git", "/opt/gh-test" ]
             - [ cloud-init-per, instance, helm_repo, sh, -c,
-                "HOME=/root helm repo add stable https://charts.helm.sh/stable" ]
-            - [ cloud-init-per, instance, helm_repo, sh, -c,
                 "HOME=/root helm repo add nginx-stable https://helm.nginx.com/stable" ]
+            - [ cloud-init-per, instance, helm_dep, sh, -c,
+                "HOME=/root helm dependency build /opt/gh-test/gh-test-chart" ]
             - [ cloud-init-per, instance, helm_apply, sh, -c,
                 "HOME=/root helm install --set \"nginx-ingress.controller.service.externalIPs={$(docker inspect --format='{{ .NetworkSettings.Networks.kind.IPAddress }}' kind-control-plane)}\" gh /opt/gh-test/gh-test-chart" ]
     USER_DATA
