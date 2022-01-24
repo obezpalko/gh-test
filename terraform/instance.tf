@@ -63,6 +63,28 @@ resource "aws_instance" "kind" {
               content: |
                 export GOPATH=/root/go
                 export PATH=$${PATH}:/root/go
+                which helm > /dev/null && source <(helm completion bash)
+                which kind > /dev/null && source <(kind completion bash)
+                which kubectl > /dev/null && source <(kubectl completion bash)
+            - path: /root/kind.yaml
+              content: |
+                kind: Cluster
+                apiVersion: kind.x-k8s.io/v1alpha4
+                nodes:
+                  - role: control-plane
+                    kubeadmConfigPatches:
+                      - |
+                        kind: InitConfiguration
+                        nodeRegistration:
+                          kubeletExtraArgs:
+                            node-labels: "ingress-ready=true"
+                    extraPortMappings:
+                      - containerPort: 80
+                        hostPort: 80
+                        protocol: TCP
+                      - containerPort: 443
+                        hostPort: 443
+                        protocol: TCP
         runcmd:
             - [ cloud-init-per, instance, docker_enable, systemctl, enable, docker ]
             - [ cloud-init-per, instance, docker_start, systemctl, start, docker ]
@@ -70,14 +92,17 @@ resource "aws_instance" "kind" {
                 "HOME=/root go get sigs.k8s.io/kind" ]
             - [ cloud-init-per, instance, kind_bin, ln, -sf, /root/go/bin/kind, /usr/bin/ ]
             - [ cloud-init-per, instance, kind_cluster, sh, -c,
-                "HOME=/root kind create cluster" ]
+                "HOME=/root kind create cluster --config=/root/kind.yaml" ]
             - [ cloud-init-per, instance, helm_install, sh, -c,
                 "curl -L -s https://get.helm.sh/helm-v3.7.2-linux-amd64.tar.gz | sudo tar -C /usr/bin --strip-components=1 -xzf - linux-amd64/helm" ]
             - [ cloud-init-per, instance, repo_clone,
                 git, clone, "https://github.com/obezpalko/gh-test.git", "/opt/gh-test" ]
             - [ cloud-init-per, instance, helm_repo, sh, -c,
                 "HOME=/root helm repo add stable https://charts.helm.sh/stable" ]
-
+            - [ cloud-init-per, instance, helm_repo, sh, -c,
+                "HOME=/root helm repo add nginx-stable https://helm.nginx.com/stable" ]
+            - [ cloud-init-per, instance, helm_apply, sh, -c,
+                "HOME=/root helm install --set \"nginx-ingress.controller.service.externalIPs={$(docker inspect --format='{{ .NetworkSettings.Networks.kind.IPAddress }}' kind-control-plane)}\" gh /opt/gh-test/gh-test-chart" ]
     USER_DATA
 }
 

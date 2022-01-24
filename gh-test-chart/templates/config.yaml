@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "gh-test-chart.fullname" . }}
+  labels:
+    {{- include "gh-test-chart.labels" . | nindent 4 }}
+data:
+{{- range .Values.config.data }}
+  {{ .key }}: {{ .value }}
+{{- end}}
+...
