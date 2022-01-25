@@ -61,10 +61,11 @@ def get_all_pods():
     v1 = client.CoreV1Api()
     logging.info('getting all pods')
     ret = v1.list_pod_for_all_namespaces(watch=False)
+    logging.debug('all pods: %s', ret)
     return '\n'.join(
         [
             f'{i.status.pod_ip}\t{i.metadata.namespace}\t{i.metadata.name}'
-            for i in ret
+            for i in ret.items
         ],
     )
 
