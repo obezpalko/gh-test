@@ -86,6 +86,8 @@ resource "aws_instance" "kind" {
                         hostPort: 443
                         protocol: TCP
         runcmd:
+            - [ cloud-init-per, instance, swap_enable, sh, -c,
+                "dd if=/dev/zero of=/swap bs=1M count=512 && mkswap /swap && chmod 0600 /swap && swapon -f /swap" ]
             - [ cloud-init-per, instance, docker_enable, systemctl, enable, docker ]
             - [ cloud-init-per, instance, docker_start, systemctl, start, docker ]
             - [ cloud-init-per, instance, kind, sh, -c,
