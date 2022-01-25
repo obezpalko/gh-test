@@ -30,6 +30,8 @@ class AppHTTPHandler(http.server.BaseHTTPRequestHandler):
             response = get_all_pods()
         elif self.path == '/me':
             response = socket.gethostbyname(socket.gethostname())
+        elif self.path == '/version':
+            response = environ.get('APP_VERSION', '')
         elif self.path == '/health':
             env = environ.get('ENV', False)
             response = f'OK {env}' if env else 'OK'

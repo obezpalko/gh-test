@@ -48,6 +48,10 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
+            {{- if .Chart.AppVersion }}
+            - name: APP_VERSION
+              value: {{ .Chart.AppVersion }}
+            {{ end }}
             - name: ENV
               valueFrom:
                 configMapKeyRef:
