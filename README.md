@@ -23,6 +23,8 @@
 
    it will create `t2.micro` instace and deploy app to it
 
+   there is python script inside terraform to detect my home provider ip addresses. SSH is only allowed from Partner networks
+
 1. Helm charts are under [gh-test-chart](./gh-test-chart) and applied automatically on the instance creation.
 
    I didn't realize automatic app updates (because the cluster may still not be created at this time), but I suppose to use 1 of the following methods:
