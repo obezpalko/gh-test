@@ -51,7 +51,7 @@ spec:
             - name: ENV
               valueFrom:
                 configMapKeyRef:
-                  name: env
+                  name: {{ include "gh-test-chart.fullname" . }}
                   key: ENV
       {{- with .Values.nodeSelector }}
       nodeSelector:
