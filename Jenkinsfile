@@ -13,7 +13,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'docker build -t obezpalko/gh-test:latest .'
+                sh 'docker build -t obezpalko/gh-test:${env.BUILD_ID} .'
             }
         }
         stage('Login to dockerhub'){
@@ -23,7 +23,7 @@ pipeline {
         }
         stage('Push to dockerhub'){
             steps {
-                sh 'docker push obezpalko/gh-test:latest'
+                sh 'docker push obezpalko/gh-test:${env.BUILD_ID}'
             }
         }
     }

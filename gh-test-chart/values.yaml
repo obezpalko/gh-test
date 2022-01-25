@@ -7,7 +7,7 @@ replicaCount: 1
 
 image:
   repository: obezpalko/gh-test
-  pullPolicy: Always
+  pullPolicy: IfNotPresent  # Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
 
