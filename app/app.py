@@ -1,9 +1,13 @@
-#!/usr/bin/env python
+#!/app/env/bin/python
 import http.server
 import logging
 import socket
 from os import environ
 from threading import Thread
+
+from kubernetes import client
+from kubernetes import config
+
 
 logging.basicConfig(
     format='%(asctime)s %(levelname)s: %(message)s',
@@ -23,7 +27,7 @@ class AppHTTPHandler(http.server.BaseHTTPRequestHandler):
         """ manage get requests """
         content_type = 'text/plain'
         if self.path == '/pods':
-            response = 'will return list of pods in cluster'
+            response = get_all_pods()
         elif self.path == '/me':
             response = socket.gethostbyname(socket.gethostname())
         elif self.path == '/health':
@@ -49,6 +53,19 @@ def run_http_server(server_class=http.server.HTTPServer, handler_class=AppHTTPHa
     logging.info(
         'http server started on %s:%s',
         socket.gethostbyname(socket.gethostname()), port,
+    )
+
+
+def get_all_pods():
+    config.load_incluster_config()
+    v1 = client.CoreV1Api()
+    logging.info('getting all pods')
+    ret = v1.list_pod_for_all_namespaces(watch=False)
+    return '\n'.join(
+        [
+            f'{i.status.pod_ip}\t{i.metadata.namespace}\t{i.metadata.name}'
+            for i in ret
+        ],
     )
 
 

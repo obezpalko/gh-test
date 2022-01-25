@@ -89,5 +89,3 @@ config:
   data:
     - key: ENV
       value: production
-    - key: API_TOKEN
-      value: API_TOKEN
