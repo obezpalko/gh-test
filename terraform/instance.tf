@@ -11,7 +11,7 @@ output "ami" {
 resource "aws_instance" "kind" {
   ami                    = data.aws_ami.awslinux.id
   instance_type          = "t2.micro"
-  key_name               = "alexbe"
+  key_name               = aws_key_pair.kind.key_name
   vpc_security_group_ids = [aws_security_group.kind.id]
   tags = {
     Name = "kind"
